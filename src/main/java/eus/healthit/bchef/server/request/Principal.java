@@ -2,7 +2,6 @@ package eus.healthit.bchef.server.request;
 
 import static spark.Spark.before;
 import static spark.Spark.get;
-import static spark.Spark.halt;
 import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
@@ -19,7 +18,7 @@ import eus.healthit.bchef.server.request.handlers.UserAPI;
 
 public class Principal {
 	public static void main(String[] args) {
-		
+
 		port(80);
 		path("/api", () -> {
 
@@ -41,6 +40,8 @@ public class Principal {
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));
 				put("/config", (req, res) -> UserAPI.userUpdate(req, res));
 				put("/visit", (req, res) -> UserAPI.addHistory(req, res));
+				put("/save", (req, res) -> UserAPI.makeSavedRelation(req, res));
+				put("/unsave", (req, res) -> UserAPI.removeSavedRelation(req, res));
 				path("/shoplist", () -> {
 					put("/add", (req, res) -> UserAPI.shoplistAdd(req, res));
 					put("/remove", (req, res) -> UserAPI.shoplistRem(req, res));

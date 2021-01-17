@@ -38,14 +38,12 @@ public class QueryCon {
 			MessageDigest digest = MessageDigest.getInstance("md5");
 			byte[] hash = digest.digest(base.getBytes("UTF-8"));
 			StringBuffer hexString = new StringBuffer();
-
 			for (int i = 0; i < hash.length; i++) {
 				String hex = Integer.toHexString(0xff & hash[i]);
 				if (hex.length() == 1)
 					hexString.append('0');
 				hexString.append(hex);
 			}
-
 			return hexString.toString();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -73,26 +71,23 @@ public class QueryCon {
 		Statement stmt = getStatement();
 		stmt.execute(query);
 	}
-	
+
 	public static StatusCode exceptionHandler(Exception e) {
 		e.printStackTrace();
 		if (e instanceof JSONException) {
-			spark.Spark.halt(400,"400 BAD REQUEST");
+			spark.Spark.halt(400, "400 BAD REQUEST");
 			return StatusCode.BAD_REQUEST;
-		}
-		else if (e instanceof PSQLException) {
-			spark.Spark.halt(409,"409 CONFLICT");
+		} else if (e instanceof PSQLException) {
+			spark.Spark.halt(409, "409 CONFLICT");
 			return StatusCode.USER_DUPLICATED;
-		}
-		else {
+		} else {
 			spark.Spark.halt(500, "500 INTERNAL SERVER ERROR");
 			return StatusCode.SERVER_ERROR;
 		}
 	}
-	
+
 	public static JSONObject statusMessage(StatusCode s) {
 		return new JSONObject().put("status", s);
 	}
-	
 
 }

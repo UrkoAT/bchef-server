@@ -70,7 +70,6 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String name = json.getString("name");
 			Integer id_user = json.getInt("id_user");
-			Boolean ticked = json.getBoolean("ticked");
 
 			return UserRepository.shopAdd(name, id_user);
 		} catch (Exception e) {
@@ -93,7 +92,7 @@ public class UserAPI {
 		try {
 			JSONObject json = new JSONObject(req.body());
 			int id = json.getInt("id");
-			UserRepository.shopSet(id, (json.getBoolean("ticked"))?true:false);
+			UserRepository.shopSet(id, (json.getBoolean("ticked")) ? true : false);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
@@ -110,11 +109,59 @@ public class UserAPI {
 	}
 
 	public static JSONObject addHistory(Request req, Response res) {
-		JSONObject json = new JSONObject(req.body());
-		Integer id = json.getInt("id");
-		String uuid = json.getString("uuid");
 		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			String uuid = json.getString("uuid");
 			RecipeRepository.makeHistoryRelation(id, uuid);
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject makeSavedRelation(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			String uuid = json.getString("uuid");
+			UserRepository.makeSavedRelation(id, uuid);
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject removeSavedRelation(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			String uuid = json.getString("uuid");
+			UserRepository.removeSavedRelation(id, uuid);
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject follow(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			Integer id_followed = json.getInt("id_followed");
+			UserRepository.follow(id, id_followed);
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject unfollow(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			Integer id_followed = json.getInt("id_followed");
+			UserRepository.unfollow(id, id_followed);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));

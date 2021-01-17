@@ -17,8 +17,6 @@ public class RecipeAPI {
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
-	
-		
 	}
 
 	public static JSONObject vote(Request req, Response res) {
@@ -26,7 +24,7 @@ public class RecipeAPI {
 		Integer id = json.getInt("id_user");
 		String uuid = json.getString("uuid_user");
 		Integer rating = json.getInt("rating");
-		
+
 		try {
 			RecipeRepository.vote(id, uuid, rating);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);

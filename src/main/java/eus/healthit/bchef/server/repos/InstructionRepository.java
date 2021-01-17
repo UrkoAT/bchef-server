@@ -19,7 +19,6 @@ public class InstructionRepository {
 
 	private static JSONObject parseInstruction(ResultSet rset) throws JSONException, SQLException {
 		JSONObject instruction = new JSONObject();
-
 		instruction.put("id", rset.getInt("id")).put("action", rset.getString("action"))
 				.put("value", rset.getInt("value")).put("img", ImageRepository.encodeImage(rset.getString("img")))
 				.put("num", rset.getInt("num")).put("duration", rset.getTime("duration").toString());

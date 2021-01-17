@@ -14,7 +14,6 @@ public class UserRepository {
 
 	public static JSONObject addUser(String name, String surname, String profilePicPath, String email, String username,
 			String password) throws PSQLException, SQLException {
-
 		String query = "INSERT INTO public.users (name, surname, profilepic, email, username, pass) VALUES"
 				+ String.format("('%s', '%s', '%s', '%s', '%s', '%s')", name, surname, profilePicPath, email, username,
 						QueryCon.md5(password));
@@ -25,7 +24,6 @@ public class UserRepository {
 	public static JSONObject auth(String username, String password) throws SQLException {
 		String query = "SELECT * FROM public.users WHERE UPPER(username) = "
 				+ String.format("UPPER('%s') AND pass = '%s') INNER JOIN", username, QueryCon.md5(password));
-
 		ResultSet rSet = QueryCon.executeQuery(query);
 		if (!rSet.next()) {
 			return new JSONObject().put("valid", false);
@@ -52,20 +50,15 @@ public class UserRepository {
 	}
 
 	private static List<JSONObject> getShoplist(int id) throws SQLException {
-
 		String query = "SELECT * FROM public.rel_shoplist INNER JOIN public.shoplist ON (rel_shoplist.id_shoplist_item = shoplist.id_shoplist)"
 				+ "WHERE rel_shoplist.id_shoplist_item = " + id + "";
-
 		ResultSet rSetShop = QueryCon.executeQuery(query);
-
 		List<JSONObject> shoplist = new ArrayList<>();
-
 		while (rSetShop.next()) {
 			JSONObject innerJsonObject = new JSONObject();
 			innerJsonObject.put("name", rSetShop.getString("name")).put("ticked", rSetShop.getBoolean("ticked"));
 			shoplist.add(innerJsonObject);
 		}
-
 		return shoplist;
 	}
 
@@ -86,32 +79,26 @@ public class UserRepository {
 				.put("profilepic", ImageRepository.encodeImage(rSet.getString("profilepic")))
 				.put("shoplist", getShoplist(id)).put("folowed", getFollowed(id)).put("followers", getFollowers(id))
 				.put("saved", RecipeRepository.getSaved(id)).put("history", RecipeRepository.getHistory(id));
-
 		return user;
 	}
 
 	public static JSONObject shopAdd(String name, int id) throws SQLException {
-		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('"+name+"', false) RETURNING id";
+		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('" + name + "', false) RETURNING id";
 		Integer idSh = QueryCon.executeQuery(query).getInt("id");
-		
-		query = "INSERT INTO public.rel_shoplist VALUES ("+id+", "+idSh+")";
-		
+		query = "INSERT INTO public.rel_shoplist VALUES (" + id + ", " + idSh + ")";
 		JSONObject json = new JSONObject();
 		json.put("item", idSh);
 		json.put("status", StatusCode.SUCCESSFUL);
-		
 		return json;
 	}
 
-
-
 	public static void shopSet(int id, boolean ticked) throws SQLException {
-		String query = "UPDATE public.shoplist SET shoplist.ticked = "+ticked+" WHERE shoplist.id = "+id;
+		String query = "UPDATE public.shoplist SET shoplist.ticked = " + ticked + " WHERE shoplist.id = " + id;
 		QueryCon.execute(query);
 	}
 
-	public static void userUpdate(Integer id, String name, String surname, String profilePicPath, String email, String username,
-			String password) throws SQLException {
+	public static void userUpdate(Integer id, String name, String surname, String profilePicPath, String email,
+			String username, String password) throws SQLException {
 		String query = String.format("UPDATE public.users SET users.name = '%s', users.surname = '%s',"
 				+ " users.profilepic = '%s', users.email = '%s', users.username = '%s', users.password = '%s' WHERE users.id = %d",
 				name, surname, profilePicPath, email, username, QueryCon.md5(password));
@@ -129,7 +116,31 @@ public class UserRepository {
 	}
 
 	public static void shopRemove(int id) throws SQLException {
-		String query = "DELETE FROM public.shoplist WHERE shoplist.id = "+id;
+		String query = "DELETE FROM public.shoplist WHERE shoplist.id = " + id;
+		QueryCon.execute(query);
+	}
+
+	public static void makeSavedRelation(int userID, String uuid) throws SQLException {
+		String query = String.format("INSERT INTO public.rel_saved VALUES (%d, '%s' )", userID, uuid);
+		QueryCon.execute(query);
+	}
+
+	public static void removeSavedRelation(int userID, String uuid) throws SQLException {
+		String query = String.format(
+				"DELETE FROM public.rel_saved WHERE rel_saved.id_user = %d AND rel_saved.uuid_recipe ='%s' )", userID,
+				uuid);
+		QueryCon.execute(query);
+	}
+
+	public static void follow(Integer id, Integer id_followed) throws SQLException {
+		String query = String.format("INSERT INTO  public.rel_followed VALUES ('%s', '%s')", id, id_followed);
+		QueryCon.execute(query);
+	}
+
+	public static void unfollow(Integer id, Integer id_followed) throws SQLException {
+		String query = String.format(
+				"DELETE FROM public.rel_followed WHERE rel_followed.id_user = %d AND rel_followed.id_followed = %d )",
+				id, id_followed);
 		QueryCon.execute(query);
 	}
 

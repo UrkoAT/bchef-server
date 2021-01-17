@@ -19,9 +19,7 @@ public class IngredientRepository {
 
 	private static JSONObject parseIngredient(ResultSet rset) throws JSONException, SQLException {
 		JSONObject ingredient = new JSONObject();
-
 		ingredient.put("id", rset.getInt("id")).put("name", rset.getString("name")).put("type", rset.getString("type"));
-
 		return ingredient;
 	}
 
@@ -36,16 +34,13 @@ public class IngredientRepository {
 	public static JSONObject ingredientLike(String like) throws JSONException, SQLException {
 		String query = "SELECT * FROM public.ingredients WHERE ingredients.name LIKE '%" + like + "%'";
 		ResultSet rSet = QueryCon.executeQuery(query);
-		
 		return new JSONObject().put("ingredients", parseIngredientList(rSet));
-		
 	}
-	
+
 	public static void makeRelation(int idIng, String uuidRecipe, String amount) throws SQLException {
-		String query = String.format("INSERT INTO public.rel_ingredients VALUES ('%s', %d, %d )", uuidRecipe, idIng, amount);
+		String query = String.format("INSERT INTO public.rel_ingredients VALUES ('%s', %d, %d )", uuidRecipe, idIng,
+				amount);
 		QueryCon.execute(query);
 	}
-	
-	
 
 }
