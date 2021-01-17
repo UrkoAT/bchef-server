@@ -33,18 +33,14 @@ public class Principal {
 			get("/search", (req, res) -> SearchAPI.search(req, res));
 			get("/ingredient", (req, res) -> IngredientAPI.ingredientLike(req, res));
 			get("/page", (req, res) -> SearchAPI.page(req, res));
-			// get("/izan", (req, res) -> halt(418, "<h1>418 A jorge le gusta el Té"));
 
 			/* ############### PUT ############### */
-			before("/user/*", (request, response) -> {
-				System.out.println(request.requestMethod());
-				if (request.requestMethod() != "PUT")
-					halt(405, "<h1>405 Method Not Allowed");
-			});
 			put("/auth", (req, res) -> UserAPI.auth(req, res));
 			path("/user", () -> {
+				get("/byId", (req, res) -> UserAPI.getById(req, res));
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));
 				put("/config", (req, res) -> UserAPI.userUpdate(req, res));
+				put("/visit", (req, res) -> UserAPI.addHistory(req, res));
 				path("/shoplist", () -> {
 					put("/add", (req, res) -> UserAPI.shoplistAdd(req, res));
 					put("/remove", (req, res) -> UserAPI.shoplistRem(req, res));
@@ -54,13 +50,9 @@ public class Principal {
 			});
 
 			/* ############### POST ############### */
-			before("/register/*", (request, response) -> {
-				if (request.requestMethod() != "POST")
-					halt(405, "<h1>405 Method Not Allowed");
-			});
 			path("/register", () -> {
 				post("/user", (req, res) -> UserAPI.addUser(req, res));
-				post("/check", (req, res) -> UserAPI.checkUser(req, res));
+				get("/check", (req, res) -> UserAPI.checkUser(req, res));
 				post("/recipe", (req, res) -> RecipeAPI.addRecipe(req, res));
 			});
 		});

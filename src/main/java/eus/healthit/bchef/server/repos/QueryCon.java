@@ -7,6 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.postgresql.util.PSQLException;
+
+import eus.healthit.bchef.server.request.StatusCode;
+
 public class QueryCon {
 	public static final String DBURL = "jdbc:postgresql://servkolay.ddns.net:5432/Data";
 
@@ -67,5 +73,26 @@ public class QueryCon {
 		Statement stmt = getStatement();
 		stmt.execute(query);
 	}
+	
+	public static StatusCode exceptionHandler(Exception e) {
+		e.printStackTrace();
+		if (e instanceof JSONException) {
+			spark.Spark.halt(400,"400 BAD REQUEST");
+			return StatusCode.BAD_REQUEST;
+		}
+		else if (e instanceof PSQLException) {
+			spark.Spark.halt(409,"409 CONFLICT");
+			return StatusCode.USER_DUPLICATED;
+		}
+		else {
+			spark.Spark.halt(500, "500 INTERNAL SERVER ERROR");
+			return StatusCode.SERVER_ERROR;
+		}
+	}
+	
+	public static JSONObject statusMessage(StatusCode s) {
+		return new JSONObject().put("status", s);
+	}
+	
 
 }

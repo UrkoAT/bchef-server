@@ -2,11 +2,14 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.management.Query;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,8 +34,8 @@ public class RecipeRepository {
 
 		String uuid = rSet.getString("uuid");
 
-		recipe.put("title", rSet.getString("title")).put("uuid", uuid).put("name", rSet.getString("name"))
-				.put("author", rSet.getInt("author")).put("rating", rSet.getInt("rating"))
+		recipe.put("uuid", uuid).put("name", rSet.getString("name"))
+				.put("author", rSet.getInt("author")).put("rating", RecipeRepository.getRating(uuid))
 				.put("timestamp", rSet.getTimestamp("publish_date").toString())
 				.put("duration", rSet.getTime("duration").toString())
 				.put("img", ImageRepository.encodeImage(rSet.getString("img")))
@@ -41,6 +44,8 @@ public class RecipeRepository {
 
 		return recipe;
 	}
+
+	
 
 	private static List<JSONObject> parseRecipeList(ResultSet rSet) throws SQLException {
 		List<JSONObject> list = new ArrayList<>();
@@ -67,7 +72,7 @@ public class RecipeRepository {
 	}
 	
 	
-	private static void makePublishedRelation(int userID, String uuid) throws SQLException {
+	public static void makePublishedRelation(int userID, String uuid) throws SQLException {
 		String query = String.format("INSERT INTO public.rel_published VALUES (%d, '%s' )", userID, uuid);
 		QueryCon.execute(query);
 	}
@@ -92,17 +97,47 @@ public class RecipeRepository {
 	}
 	
 
-	public static JSONObject insertRecipe(JSONObject jsonObject) {
+	private static Integer getRating(String uuid) throws SQLException {
+		String query = "SELECT COUNT(*), SUM(rating) FROM rel_rating WHERE rel_rating.uuid_recipe = '"+ uuid+ "'";
+		ResultSet rSet = QueryCon.executeQuery(query);
+		Integer count = rSet.getInt("count");
+		Integer sum = rSet.getInt("sum");
+		return sum/count;
+	}
+	
+	public static void insertRecipe(JSONObject jsonObject) throws JSONException, SQLException {
+		String uuid = jsonObject.getString("uuid");
+		String name = jsonObject.getString("name");
+		Integer author = jsonObject.getInt("author");
+		String publishDate = jsonObject.getString("publish_date");
+		String duration = jsonObject.getString("duration");
+		String imagePath = ImageRepository.saveImage(jsonObject.getString("img")) ;
+		JSONArray ingredients = jsonObject.getJSONArray("ingredients");
+		JSONArray instructions = jsonObject.getJSONArray("instructions");
+		 
+		/* No puedo hacer esto por que java es tonto y no puede throwear una excepcion desde un lambda 
+		ingredients.forEach(((json) -> IngredientRepository.makeRelation(((JSONObject)json).getInt("id"), uuid, ((JSONObject)json).getString("amount"))));
+		*/
 		
+		for (Object object : ingredients) {
+			JSONObject json = (JSONObject)object;
+			IngredientRepository.makeRelation(json.getInt("id"), uuid, json.getString("amount"));
+		}
 		
+		for (Object object : instructions) {
+			JSONObject json = (JSONObject)object;
+			InstructionRepository.makeRelation(InstructionRepository.insertInstruction(json, uuid), uuid);
+		}
+		String query = "INSERT INTO public.recipes (uuid, name, author, publish_date, dutation, img) VALUES "
+				+ String.format("('%s', '%s', '%s', '%s', '%s', '%s')", uuid, name, author, publishDate, duration, imagePath);
+		QueryCon.execute(query);
 		
-		
-		return null;
+		makePublishedRelation(author, uuid);
 	}
 
-	public static JSONObject vote(JSONObject jsonObject) {
-		// TODO Auto-generated method stub
-		return null;
+	public static void vote(Integer id, String uuid, Integer rating) throws SQLException {
+		String query = "INSERT INTO public.rel_rating VALUES (" +id+ ", '"+ uuid+"', "+rating+")";
+		QueryCon.execute(query);
 	}
 
 }

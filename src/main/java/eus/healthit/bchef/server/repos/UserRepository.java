@@ -8,6 +8,8 @@ import java.util.List;
 import org.json.JSONObject;
 import org.postgresql.util.PSQLException;
 
+import eus.healthit.bchef.server.request.StatusCode;
+
 public class UserRepository {
 
 	public static JSONObject addUser(String name, String surname, String profilePicPath, String email, String username,
@@ -88,30 +90,47 @@ public class UserRepository {
 		return user;
 	}
 
-	public static JSONObject shopList() {
-		// TODO Auto-generated method stub
-		return null;
+	public static JSONObject shopAdd(String name, int id) throws SQLException {
+		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('"+name+"', false) RETURNING id";
+		Integer idSh = QueryCon.executeQuery(query).getInt("id");
+		
+		query = "INSERT INTO public.rel_shoplist VALUES ("+id+", "+idSh+")";
+		
+		JSONObject json = new JSONObject();
+		json.put("item", idSh);
+		json.put("status", StatusCode.SUCCESSFUL);
+		
+		return json;
 	}
 
-	public static String shopAdd() {
-		// TODO Auto-generated method stub
-		return null;
+
+
+	public static void shopSet(int id, boolean ticked) throws SQLException {
+		String query = "UPDATE public.shoplist SET shoplist.ticked = "+ticked+" WHERE shoplist.id = "+id;
+		QueryCon.execute(query);
 	}
-	
-	public static String shopRemove() {
-		// TODO Auto-generated method stub
-		return null;
+
+	public static void userUpdate(Integer id, String name, String surname, String profilePicPath, String email, String username,
+			String password) throws SQLException {
+		String query = String.format("UPDATE public.users SET users.name = '%s', users.surname = '%s',"
+				+ " users.profilepic = '%s', users.email = '%s', users.username = '%s', users.password = '%s' WHERE users.id = %d",
+				name, surname, profilePicPath, email, username, QueryCon.md5(password));
+		QueryCon.execute(query);
 	}
-	
-	public static String shopSet() {
-		// TODO Auto-generated method stub
-		return null;
+
+	public static JSONObject checkUser(String username) throws SQLException {
+		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = " + username;
+		Integer count = QueryCon.executeQuery(query).getInt("count");
+		if (count == 1) {
+			return QueryCon.statusMessage(StatusCode.USER_DUPLICATED);
+		} else {
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		}
 	}
-	
-	public static String userUpdate(String name, String surname, String profilePicPath, String email, String username, String password) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public static void shopRemove(int id) throws SQLException {
+		String query = "DELETE FROM public.shoplist WHERE shoplist.id = "+id;
+		QueryCon.execute(query);
 	}
-	
 
 }

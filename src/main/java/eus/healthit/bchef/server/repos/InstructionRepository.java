@@ -34,8 +34,8 @@ public class InstructionRepository {
 		}
 		return list;
 	}
-	
-	public static int insertInstruction(JSONObject instruction, String recipeUUID ) throws JSONException, SQLException {
+
+	public static int insertInstruction(JSONObject instruction, String recipeUUID) throws JSONException, SQLException {
 		String action = instruction.getString("action");
 		int value = instruction.getInt("value");
 		String image = ImageRepository.saveImage(instruction.getString("img"));
@@ -43,14 +43,14 @@ public class InstructionRepository {
 		int num = instruction.getInt("num");
 		String duration = instruction.getString("duration");
 		String query = "INSERT INTO public.instructions (action, value, img, txt, num, duration) "
-				+ String.format("VALUES ('%s', %d, '%s', '%s', %d, '%s')",action, value, image, text, num, duration ) + " RETURNING instructions.id";
+				+ String.format("VALUES ('%s', %d, '%s', '%s', %d, '%s')", action, value, image, text, num, duration)
+				+ " RETURNING instructions.id";
 		return QueryCon.executeQuery(query).getInt("id");
 	}
-	
+
 	public static void makeRelation(int idIns, String uuidRecipe) throws SQLException {
 		String query = String.format("INSERT INTO public.rel_instructions VALUES ('%s', %d )", uuidRecipe, idIns);
 		QueryCon.execute(query);
 	}
-	
 
 }

@@ -41,9 +41,11 @@ public class IngredientRepository {
 		
 	}
 	
-	public static void makeRelation(int idIng, String uuidRecipe, int amount) throws SQLException {
+	public static void makeRelation(int idIng, String uuidRecipe, String amount) throws SQLException {
 		String query = String.format("INSERT INTO public.rel_ingredients VALUES ('%s', %d, %d )", uuidRecipe, idIng, amount);
 		QueryCon.execute(query);
 	}
+	
+	
 
 }
