@@ -12,21 +12,20 @@ import eus.healthit.bchef.server.request.StatusCode;
 
 public class UserRepository {
 
-	public static JSONObject addUser(String name, String surname, String profilePicPath, String email, String username,
+	public static void addUser(String name, String surname, String profilePicPath, String email, String username,
 			String password) throws PSQLException, SQLException {
 		String query = "INSERT INTO public.users (name, surname, profilepic, email, username, pass) VALUES"
 				+ String.format("('%s', '%s', '%s', '%s', '%s', '%s')", name, surname, profilePicPath, email, username,
 						QueryCon.md5(password));
 		QueryCon.execute(query);
-		return new JSONObject().put("success", true);
 	}
 
 	public static JSONObject auth(String username, String password) throws SQLException {
 		String query = "SELECT * FROM public.users WHERE UPPER(username) = "
-				+ String.format("UPPER('%s') AND pass = '%s') INNER JOIN", username, QueryCon.md5(password));
+				+ String.format("UPPER('%s') AND pass = '%s')", username, QueryCon.md5(password));
 		ResultSet rSet = QueryCon.executeQuery(query);
 		if (!rSet.next()) {
-			return new JSONObject().put("valid", false);
+			return new JSONObject().put("status", StatusCode.LOGIN_ERROR);
 		}
 		return parseUser(rSet);
 	}
@@ -84,7 +83,9 @@ public class UserRepository {
 
 	public static JSONObject shopAdd(String name, int id) throws SQLException {
 		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('" + name + "', false) RETURNING id";
-		Integer idSh = QueryCon.executeQuery(query).getInt("id");
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		Integer idSh = rSet.getInt("id");
 		query = "INSERT INTO public.rel_shoplist VALUES (" + id + ", " + idSh + ")";
 		JSONObject json = new JSONObject();
 		json.put("item", idSh);
@@ -107,7 +108,9 @@ public class UserRepository {
 
 	public static JSONObject checkUser(String username) throws SQLException {
 		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = " + username;
-		Integer count = QueryCon.executeQuery(query).getInt("count");
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		Integer count = rSet.getInt("count");
 		if (count == 1) {
 			return QueryCon.statusMessage(StatusCode.USER_DUPLICATED);
 		} else {
@@ -142,6 +145,24 @@ public class UserRepository {
 				"DELETE FROM public.rel_followed WHERE rel_followed.id_user = %d AND rel_followed.id_followed = %d )",
 				id, id_followed);
 		QueryCon.execute(query);
+	}
+
+	public static String getName(Integer id) throws SQLException {
+		String query = "SELECT username FROM public.users WHERE users.id = " + id;
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		return rSet.getString("username");
+	}
+
+	public static JSONObject reauth(String username, String password) throws SQLException {
+		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = " + username +" AND users.password = " + password;
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		if (rSet.getInt("count") == 1) {
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} else {
+			return QueryCon.statusMessage(StatusCode.LOGIN_ERROR);
+		}
 	}
 
 }

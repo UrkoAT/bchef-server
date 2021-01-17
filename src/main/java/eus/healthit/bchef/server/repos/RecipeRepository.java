@@ -49,6 +49,7 @@ public class RecipeRepository {
 
 	public static JSONObject searchLike(String like) throws JSONException, SQLException {
 		String query = "SELECT * FROM public.recipes WHERE recipes.name LIKE '%" + like + "%'";
+		System.out.println(query);
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return new JSONObject().put("recipes", parseRecipeList(rSet));
 	}

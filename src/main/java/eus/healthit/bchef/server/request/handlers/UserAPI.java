@@ -21,8 +21,8 @@ public class UserAPI {
 			String email = (String) json.get("email");
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
-			return UserRepository.addUser(name, surname, profilePicPath, email, username, password).put("status",
-					StatusCode.SUCCESSFUL);
+			UserRepository.addUser(name, surname, profilePicPath, email, username, password);
+			return new JSONObject().put("status",StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
@@ -33,7 +33,7 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
-			return UserRepository.auth(username, password).put("status", StatusCode.SUCCESSFUL);
+			return UserRepository.auth(username, password).putOnce("status", StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
@@ -163,6 +163,28 @@ public class UserAPI {
 			Integer id_followed = json.getInt("id_followed");
 			UserRepository.unfollow(id, id_followed);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject getName(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			Integer id = json.getInt("id");
+			String name = UserRepository.getName(id);
+			return QueryCon.statusMessage(StatusCode.SUCCESSFUL).put("name", name);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+	
+	public static JSONObject reauth(Request req, Response res) {
+		try {
+			JSONObject json = new JSONObject(req.body());
+			String username = (String) json.get("username");
+			String password = (String) json.get("password");
+			return UserRepository.reauth(username, password).put("status", StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

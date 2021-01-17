@@ -36,6 +36,7 @@ public class Principal {
 			/* ############### PUT ############### */
 			put("/auth", (req, res) -> UserAPI.auth(req, res));
 			path("/user", () -> {
+				get("/name", (req, res) -> UserAPI.getName(req, res));
 				get("/byId", (req, res) -> UserAPI.getById(req, res));
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));
 				put("/config", (req, res) -> UserAPI.userUpdate(req, res));
@@ -47,7 +48,6 @@ public class Principal {
 					put("/remove", (req, res) -> UserAPI.shoplistRem(req, res));
 					put("/tick", (req, res) -> UserAPI.shoplistTick(req, res));
 				});
-
 			});
 
 			/* ############### POST ############### */
