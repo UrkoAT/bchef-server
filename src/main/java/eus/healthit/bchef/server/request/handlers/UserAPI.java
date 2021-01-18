@@ -58,7 +58,7 @@ public class UserAPI {
 
 	public static JSONObject checkUser(Request req, Response res) {
 		try {
-			String username = req.params("username");
+			String username = req.queryParams("username");
 			return UserRepository.checkUser(username);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
@@ -101,8 +101,8 @@ public class UserAPI {
 
 	public static JSONObject getById(Request req, Response res) {
 		try {
-			int id = Integer.valueOf(req.params("id"));
-			return UserRepository.getUserById(id).put("status", StatusCode.SUCCESSFUL);
+			int id = Integer.valueOf(req.queryParams("id"));
+			return UserRepository.getUserById(id);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
@@ -170,8 +170,7 @@ public class UserAPI {
 
 	public static JSONObject getName(Request req, Response res) {
 		try {
-			JSONObject json = new JSONObject(req.body());
-			Integer id = json.getInt("id");
+			Integer id = Integer.valueOf(req.queryParams("id"));
 			String name = UserRepository.getName(id);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL).put("name", name);
 		} catch (Exception e) {

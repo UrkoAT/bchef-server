@@ -11,8 +11,12 @@ import spark.Response;
 public class SearchAPI {
 
 	public static JSONObject search(Request req, Response res) {
+
+		String like = req.queryParams("like");
+		int page = Integer.valueOf(req.queryParams("page"));
+		System.out.println(like);
 		try {
-			return RecipeRepository.searchLike(req.params("like")).put("status", StatusCode.SUCCESSFUL);
+			return RecipeRepository.searchLike(like, page).put("status", StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
@@ -20,7 +24,7 @@ public class SearchAPI {
 
 	public static JSONObject page(Request req, Response res) {
 		try {
-			return RecipeRepository.getPage(req.params("num")).put("status", StatusCode.SUCCESSFUL);
+			return RecipeRepository.getPage(req.queryParams("num")).put("status", StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

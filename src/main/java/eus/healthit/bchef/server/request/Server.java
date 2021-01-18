@@ -16,7 +16,7 @@ import eus.healthit.bchef.server.request.handlers.RecipeAPI;
 import eus.healthit.bchef.server.request.handlers.SearchAPI;
 import eus.healthit.bchef.server.request.handlers.UserAPI;
 
-public class Principal {
+public class Server {
 	public static void main(String[] args) {
 
 		port(80);

@@ -12,14 +12,14 @@ import org.json.JSONObject;
 
 public class RecipeRepository {
 
-	static List<JSONObject> getSaved(int id) throws SQLException {
+	static JSONArray getSaved(int id) throws SQLException {
 		String query = "SELECT * FROM public.rel_saved INNER JOIN public.recipes ON (rel_saved.uuid_recipe = recipes.uuid)"
 				+ "WHERE rel_saved.id_user = " + id + "";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return parseRecipeList(rSet);
 	}
 
-	public static List<JSONObject> getHistory(int id) throws SQLException {
+	public static JSONArray getHistory(int id) throws SQLException {
 		String query = "SELECT * FROM public.rel_history INNER JOIN public.recipes ON (rel_history.uuid_recipe = recipes.uuid)"
 				+ "WHERE rel_history.id_user = " + id + "";
 		ResultSet rSet = QueryCon.executeQuery(query);
@@ -29,6 +29,7 @@ public class RecipeRepository {
 	private static JSONObject parseRecipe(ResultSet rSet) throws SQLException {
 		JSONObject recipe = new JSONObject();
 		String uuid = rSet.getString("uuid");
+		System.out.println(uuid);
 		recipe.put("uuid", uuid).put("name", rSet.getString("name")).put("author", rSet.getInt("author"))
 				.put("rating", RecipeRepository.getRating(uuid))
 				.put("timestamp", rSet.getTimestamp("publish_date").toString())
@@ -39,17 +40,16 @@ public class RecipeRepository {
 		return recipe;
 	}
 
-	private static List<JSONObject> parseRecipeList(ResultSet rSet) throws SQLException {
-		List<JSONObject> list = new ArrayList<>();
+	private static JSONArray parseRecipeList(ResultSet rSet) throws SQLException {
+		JSONArray array = new JSONArray();
 		while (rSet.next()) {
-			list.add(parseRecipe(rSet));
+			array.put(parseRecipe(rSet));
 		}
-		return list;
+		return array;
 	}
 
-	public static JSONObject searchLike(String like) throws JSONException, SQLException {
-		String query = "SELECT * FROM public.recipes WHERE recipes.name LIKE '%" + like + "%'";
-		System.out.println(query);
+	public static JSONObject searchLike(String like, int page) throws JSONException, SQLException {
+		String query = "SELECT * FROM public.recipes WHERE UPPER(recipes.name) LIKE UPPER('%" + like + "%') LIMIT 7 OFFSET " +page;
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return new JSONObject().put("recipes", parseRecipeList(rSet));
 	}
@@ -76,7 +76,10 @@ public class RecipeRepository {
 	public static void makeVoteRelation(int userID, String uuidRecipe, int rating) throws SQLException {
 		String query = "SELECT COUNT(*) FROM public.rel_rating WHERE id_user = " + userID + "AND uuid_recipe = '"
 				+ uuidRecipe + "'";
-		if (QueryCon.executeQuery(query).getInt("count") == 1) {
+		
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		if (rSet.getInt("count") == 1) {
 			query = "UPDATE public.rel_rating SET rel_rating.rating = " + rating + " WHERE rel_rating.id_user = "
 					+ userID + " AND rel_rating.uuid_recipe = " + uuidRecipe;
 		} else {
@@ -88,9 +91,10 @@ public class RecipeRepository {
 	private static Integer getRating(String uuid) throws SQLException {
 		String query = "SELECT COUNT(*), SUM(rating) FROM rel_rating WHERE rel_rating.uuid_recipe = '" + uuid + "'";
 		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
 		Integer count = rSet.getInt("count");
 		Integer sum = rSet.getInt("sum");
-		return sum / count;
+		return (count != 0)?(sum / count):5;
 	}
 
 	public static void insertRecipe(JSONObject jsonObject) throws JSONException, SQLException {

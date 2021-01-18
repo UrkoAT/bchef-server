@@ -22,7 +22,7 @@ public class RecipeAPI {
 	public static JSONObject vote(Request req, Response res) {
 		JSONObject json = new JSONObject(req.body());
 		Integer id = json.getInt("id_user");
-		String uuid = json.getString("uuid_user");
+		String uuid = json.getString("uuid_recipe");
 		Integer rating = json.getInt("rating");
 
 		try {

@@ -11,8 +11,8 @@ import org.json.JSONObject;
 public class InstructionRepository {
 
 	public static List<JSONObject> getByUuid(String uuid) throws SQLException {
-		String query = "SELECT * FROM public.rel_instruction INNER JOIN public.instructions ON (rel_instruction.id_instruction = instructions.id)"
-				+ "WHERE rel_instruction.uuid_recipe = " + uuid + "";
+		String query = "SELECT * FROM public.rel_instructions INNER JOIN public.instructions ON (rel_instructions.id_instruction = instructions.id)"
+				+ "WHERE rel_instructions.uuid_recipe = '" + uuid + "'";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return parseInstructionList(rSet);
 	}

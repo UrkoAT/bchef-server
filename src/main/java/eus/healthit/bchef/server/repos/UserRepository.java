@@ -21,8 +21,8 @@ public class UserRepository {
 	}
 
 	public static JSONObject auth(String username, String password) throws SQLException {
-		String query = "SELECT * FROM public.users WHERE UPPER(username) = "
-				+ String.format("UPPER('%s') AND pass = '%s')", username, QueryCon.md5(password));
+		String query = "SELECT * FROM public.users WHERE UPPER(users.username) = "
+				+ String.format("UPPER('%s') AND pass = '%s'", username, QueryCon.md5(password));
 		ResultSet rSet = QueryCon.executeQuery(query);
 		if (!rSet.next()) {
 			return new JSONObject().put("status", StatusCode.LOGIN_ERROR);
@@ -64,16 +64,16 @@ public class UserRepository {
 	public static JSONObject getUserById(int id) throws SQLException {
 		String query = "SELECT * FROM public.users WHERE users.id = " + id + "";
 		ResultSet rSet = QueryCon.executeQuery(query);
-		if (!rSet.next()) {
-			return parseUser(rSet);
+		if (rSet.next()) {
+			return parseUser(rSet).putOnce("status", StatusCode.SUCCESSFUL);
 		}
-		return null;
+		return QueryCon.statusMessage(StatusCode.BAD_REQUEST);
 	}
 
 	private static JSONObject parseUser(ResultSet rSet) throws SQLException {
 		JSONObject user = new JSONObject();
 		int id = rSet.getInt("id");
-		user.put("id", rSet.getString("int")).put("name", rSet.getString("name"))
+		user.put("id", rSet.getString("id")).put("name", rSet.getString("name"))
 				.put("surname", rSet.getString("surname")).put("email", rSet.getString("email"))
 				.put("profilepic", ImageRepository.encodeImage(rSet.getString("profilepic")))
 				.put("shoplist", getShoplist(id)).put("folowed", getFollowed(id)).put("followers", getFollowers(id))
@@ -107,7 +107,7 @@ public class UserRepository {
 	}
 
 	public static JSONObject checkUser(String username) throws SQLException {
-		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = " + username;
+		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = '" + username + "'";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		rSet.next();
 		Integer count = rSet.getInt("count");

@@ -12,7 +12,7 @@ public class IngredientRepository {
 
 	public static List<JSONObject> getByUuid(String uuid) throws SQLException {
 		String query = "SELECT * FROM public.rel_ingredients INNER JOIN public.ingredients ON (rel_ingredients.id_ingredient = ingredients.id)"
-				+ "WHERE rel_ingredients.uuid_recipe = " + uuid + "";
+				+ "WHERE rel_ingredients.uuid_recipe = '" + uuid + "'";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return parseIngredientList(rSet);
 	}
