@@ -36,6 +36,8 @@ public class Server {
 			/* ############### PUT ############### */
 			put("/auth", (req, res) -> UserAPI.auth(req, res));
 			path("/user", () -> {
+				put("/follow", (req, res) -> UserAPI.follow(req, res));
+				put("/unfollow", (req, res) -> UserAPI.unfollow(req, res));
 				get("/name", (req, res) -> UserAPI.getName(req, res));
 				get("/byId", (req, res) -> UserAPI.getById(req, res));
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));

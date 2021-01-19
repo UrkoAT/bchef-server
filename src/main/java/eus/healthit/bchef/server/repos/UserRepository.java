@@ -73,7 +73,7 @@ public class UserRepository {
 	private static JSONObject parseUser(ResultSet rSet) throws SQLException {
 		JSONObject user = new JSONObject();
 		int id = rSet.getInt("id");
-		user.put("id", rSet.getString("id")).put("name", rSet.getString("name"))
+		user.put("id", rSet.getInt("id")).put("name", rSet.getString("name"))
 				.put("surname", rSet.getString("surname")).put("email", rSet.getString("email"))
 				.put("profilepic", ImageRepository.encodeImage(rSet.getString("profilepic")))
 				.put("shoplist", getShoplist(id)).put("folowed", getFollowed(id)).put("followers", getFollowers(id))

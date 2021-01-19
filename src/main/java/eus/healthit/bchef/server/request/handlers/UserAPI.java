@@ -92,7 +92,7 @@ public class UserAPI {
 		try {
 			JSONObject json = new JSONObject(req.body());
 			int id = json.getInt("id");
-			UserRepository.shopSet(id, (json.getBoolean("ticked")) ? true : false);
+			UserRepository.shopSet(id, (json.getBoolean("ticked")));
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
