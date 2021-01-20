@@ -21,7 +21,7 @@ public class InstructionRepository {
 		JSONObject instruction = new JSONObject();
 		instruction.put("id", rset.getInt("id")).put("action", rset.getString("action"))
 				.put("value", rset.getInt("value")).put("img", ImageRepository.encodeImage(rset.getString("img")))
-				.put("num", rset.getInt("num")).put("duration", rset.getTime("duration").toString());
+				.put("num", rset.getInt("num")).put("duration", rset.getTime("duration").toString()).put("txt", rset.getString("txt"));
 
 		return instruction;
 	}

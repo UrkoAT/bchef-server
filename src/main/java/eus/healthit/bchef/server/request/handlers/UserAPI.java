@@ -17,7 +17,7 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String name = (String) json.get("name");
 			String surname = (String) json.get("surname");
-			String profilePicPath = ImageRepository.saveImage((String) json.get("profilepic"));
+			String profilePicPath = (json.getString("profilepic").equals("default"))?"default":ImageRepository.saveImage(json.getString("profilepic"));
 			String email = (String) json.get("email");
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
@@ -33,7 +33,7 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
-			return UserRepository.auth(username, password).putOnce("status", StatusCode.SUCCESSFUL);
+			return UserRepository.auth(username, password);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

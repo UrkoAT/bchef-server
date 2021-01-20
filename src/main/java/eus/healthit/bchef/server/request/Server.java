@@ -25,7 +25,7 @@ public class Server {
 			before("/*", (req, res) -> {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				Date date = new Date();
-				System.out.println("[" + dateFormat.format(date) + "] INFO Received API call");
+				System.out.println("[" + dateFormat.format(date) + "] INFO Received API call" + req.pathInfo());
 			});
 
 			/* ############### GET ############### */

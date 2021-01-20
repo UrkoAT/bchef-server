@@ -19,7 +19,8 @@ public class IngredientRepository {
 
 	private static JSONObject parseIngredient(ResultSet rset) throws JSONException, SQLException {
 		JSONObject ingredient = new JSONObject();
-		ingredient.put("id", rset.getInt("id")).put("name", rset.getString("name")).put("type", rset.getString("type"));
+		ingredient.put("id", rset.getInt("id")).put("name", rset.getString("name")).put("type", rset.getString("type"))
+				.put("amount", rset.getString("amount"));
 		return ingredient;
 	}
 

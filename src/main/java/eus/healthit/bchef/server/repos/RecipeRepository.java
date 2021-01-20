@@ -41,7 +41,7 @@ public class RecipeRepository {
 		return recipe;
 	}
 
-	private static JSONArray parseRecipeList(ResultSet rSet) throws SQLException {
+	public static JSONArray parseRecipeList(ResultSet rSet) throws SQLException {
 		JSONArray array = new JSONArray();
 		while (rSet.next()) {
 			array.put(parseRecipe(rSet));

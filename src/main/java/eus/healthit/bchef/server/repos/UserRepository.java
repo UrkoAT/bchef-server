@@ -3,8 +3,10 @@ package eus.healthit.bchef.server.repos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PSQLException;
 
@@ -65,7 +67,7 @@ public class UserRepository {
 		String query = "SELECT * FROM public.users WHERE users.id = " + id + "";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		if (rSet.next()) {
-			return parseUser(rSet).putOnce("status", StatusCode.SUCCESSFUL);
+			return parseUser(rSet);
 		}
 		return QueryCon.statusMessage(StatusCode.BAD_REQUEST);
 	}
@@ -73,12 +75,21 @@ public class UserRepository {
 	private static JSONObject parseUser(ResultSet rSet) throws SQLException {
 		JSONObject user = new JSONObject();
 		int id = rSet.getInt("id");
+		String pString = rSet.getString("profilepic");
 		user.put("id", rSet.getInt("id")).put("name", rSet.getString("name"))
 				.put("surname", rSet.getString("surname")).put("email", rSet.getString("email"))
-				.put("profilepic", ImageRepository.encodeImage(rSet.getString("profilepic")))
-				.put("shoplist", getShoplist(id)).put("folowed", getFollowed(id)).put("followers", getFollowers(id))
-				.put("saved", RecipeRepository.getSaved(id)).put("history", RecipeRepository.getHistory(id));
-		return user;
+				.put("profilepic", (pString.equals("default"))?"default":ImageRepository.encodeImage(pString))
+				.put("shoplist", getShoplist(id)).put("followed", getFollowed(id)).put("followers", getFollowers(id))
+				.put("saved", RecipeRepository.getSaved(id)).put("username", rSet.getString("username"))
+				.put("history", RecipeRepository.getHistory(id)).put("published", getPublished(id));
+		return user.put("status", StatusCode.SUCCESSFUL);
+	}
+
+	private static JSONArray getPublished(int id) throws SQLException {
+		String query = "SELECT * FROM public.rel_published INNER JOIN public.recipes ON (rel_published.uuid_recipe = recipes.uuid) WHERE rel_published.id_user = " + id;
+		ResultSet rSet = QueryCon.executeQuery(query);
+		JSONArray array = RecipeRepository.parseRecipeList(rSet);
+		return array;
 	}
 
 	public static JSONObject shopAdd(String name, int id) throws SQLException {
