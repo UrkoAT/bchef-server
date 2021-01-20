@@ -14,9 +14,13 @@ import javax.imageio.ImageIO;
 public class ImageRepository {
 
 	public static String saveImage(String imageString) throws SQLException {
+		if (imageString.equals("nochange")) {
+			return "nochange";
+		}
 		BufferedImage img = (BufferedImage) decodeImage(imageString);
 		File file = null;
 		try {
+			
 			file = new File("main/resources/" + UUID.randomUUID().toString() + ".jpg");
 			file.createNewFile();
 			ImageIO.write(img, "jpg", file);
@@ -28,6 +32,7 @@ public class ImageRepository {
 
 	public static Image decodeImage(String codedImage) {
 		try {
+			
 			byte[] bytes = Base64.getDecoder().decode(codedImage);
 			ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 			BufferedImage bImage2 = ImageIO.read(bis);

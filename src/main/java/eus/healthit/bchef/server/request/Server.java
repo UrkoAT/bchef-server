@@ -43,6 +43,7 @@ public class Server {
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));
 				put("/config", (req, res) -> UserAPI.userUpdate(req, res));
 				put("/visit", (req, res) -> UserAPI.addHistory(req, res));
+				put("/reauth", (req, res) -> UserAPI.reauth(req, res) );
 				put("/save", (req, res) -> UserAPI.makeSavedRelation(req, res));
 				put("/unsave", (req, res) -> UserAPI.removeSavedRelation(req, res));
 				path("/shoplist", () -> {

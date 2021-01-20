@@ -76,9 +76,9 @@ public class UserRepository {
 		JSONObject user = new JSONObject();
 		int id = rSet.getInt("id");
 		String pString = rSet.getString("profilepic");
-		user.put("id", rSet.getInt("id")).put("name", rSet.getString("name"))
-				.put("surname", rSet.getString("surname")).put("email", rSet.getString("email"))
-				.put("profilepic", (pString.equals("default"))?"default":ImageRepository.encodeImage(pString))
+		user.put("id", rSet.getInt("id")).put("name", rSet.getString("name")).put("surname", rSet.getString("surname"))
+				.put("email", rSet.getString("email"))
+				.put("profilepic", (pString.equals("default")) ? "default" : ImageRepository.encodeImage(pString))
 				.put("shoplist", getShoplist(id)).put("followed", getFollowed(id)).put("followers", getFollowers(id))
 				.put("saved", RecipeRepository.getSaved(id)).put("username", rSet.getString("username"))
 				.put("history", RecipeRepository.getHistory(id)).put("published", getPublished(id));
@@ -86,7 +86,8 @@ public class UserRepository {
 	}
 
 	private static JSONArray getPublished(int id) throws SQLException {
-		String query = "SELECT * FROM public.rel_published INNER JOIN public.recipes ON (rel_published.uuid_recipe = recipes.uuid) WHERE rel_published.id_user = " + id;
+		String query = "SELECT * FROM public.rel_published INNER JOIN public.recipes ON (rel_published.uuid_recipe = recipes.uuid) WHERE rel_published.id_user = "
+				+ id;
 		ResultSet rSet = QueryCon.executeQuery(query);
 		JSONArray array = RecipeRepository.parseRecipeList(rSet);
 		return array;
@@ -111,9 +112,19 @@ public class UserRepository {
 
 	public static void userUpdate(Integer id, String name, String surname, String profilePicPath, String email,
 			String username, String password) throws SQLException {
-		String query = String.format("UPDATE public.users SET users.name = '%s', users.surname = '%s',"
-				+ " users.profilepic = '%s', users.email = '%s', users.username = '%s', users.password = '%s' WHERE users.id = %d",
-				name, surname, profilePicPath, email, username, QueryCon.md5(password));
+		String query;
+		if (profilePicPath.equals("nochange")) {
+			query = String.format(
+					"UPDATE public.users SET name = '%s', surname = '%s',"
+							+ " email = '%s', username = '%s', pass = '%s' WHERE id = %d",
+					name, surname, email, username, QueryCon.md5(password), id);
+
+		}
+		query = String.format(
+				"UPDATE public.users SET name = '%s', surname = '%s',"
+						+ " profilepic = '%s', email = '%s', username = '%s', pass = '%s' WHERE id = %d",
+				name, surname, profilePicPath, email, username, QueryCon.md5(password), id);
+		System.out.println(query);
 		QueryCon.execute(query);
 	}
 
@@ -166,7 +177,8 @@ public class UserRepository {
 	}
 
 	public static JSONObject reauth(String username, String password) throws SQLException {
-		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = " + username +" AND users.password = " + password;
+		String query = "SELECT COUNT(*) FROM public.users WHERE users.username = '" + username + "' AND users.pass = '"
+				+ password + "'";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		rSet.next();
 		if (rSet.getInt("count") == 1) {

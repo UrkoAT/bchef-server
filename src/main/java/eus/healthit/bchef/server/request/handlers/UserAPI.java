@@ -42,16 +42,18 @@ public class UserAPI {
 	public static JSONObject userUpdate(Request req, Response res) {
 		try {
 			JSONObject json = new JSONObject(req.body());
-			Integer id = json.getInt("id");
+			Integer id = json.getInt("id_user");
 			String name = json.getString("name");
 			String surname = json.getString("surname");
-			String profilePicPath = ImageRepository.saveImage((String) json.get("profilepic"));
+			String img = (String) json.get("profilepic");
+			String profilePicPath = (img.equals("nochange"))?"nochange":ImageRepository.saveImage(img);
 			String email = json.getString("email");
 			String username = json.getString("username");
 			String password = json.getString("password");
 			UserRepository.userUpdate(id, name, surname, profilePicPath, email, username, password);
 			return QueryCon.statusMessage(StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
 	}
@@ -183,7 +185,7 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
-			return UserRepository.reauth(username, password).put("status", StatusCode.SUCCESSFUL);
+			return UserRepository.reauth(username, QueryCon.md5(password)).put("status", StatusCode.SUCCESSFUL);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
