@@ -1,5 +1,7 @@
 package eus.healthit.bchef.server.request.handlers;
 
+import java.sql.Timestamp;
+
 import org.json.JSONObject;
 
 import eus.healthit.bchef.server.repos.ImageRepository;
@@ -186,6 +188,27 @@ public class UserAPI {
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
 			return UserRepository.reauth(username, QueryCon.md5(password)).put("status", StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject getAllUsers(Request req, Response res) {
+		try {
+			return UserRepository.getAllUsers().put("status", StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+	
+	public static JSONObject getHistoryBetween(Request req, Response res) {
+		int userId = Integer.valueOf(req.queryParams("userid"));
+		String from = req.queryParams("from");
+		Timestamp tFrom = Timestamp.valueOf(from);
+		String until = req.queryParams("until");
+		Timestamp tUntil = Timestamp.valueOf(until);
+		try {
+			return UserRepository.getHistoryBetween(userId, tFrom, tUntil);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

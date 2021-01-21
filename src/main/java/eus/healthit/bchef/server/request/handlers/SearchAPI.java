@@ -1,5 +1,8 @@
 package eus.healthit.bchef.server.request.handlers;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.json.JSONObject;
 
 import eus.healthit.bchef.server.repos.QueryCon;
@@ -25,6 +28,19 @@ public class SearchAPI {
 	public static JSONObject page(Request req, Response res) {
 		try {
 			return RecipeRepository.getPage(req.queryParams("num")).put("status", StatusCode.SUCCESSFUL);
+		} catch (Exception e) {
+			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
+		}
+	}
+
+	public static JSONObject byIngredient(Request req, Response res) {
+		Set<String> sech =  req.queryParams();
+		Set<String> set = new HashSet<>();
+		for (String string : sech) {
+			set.add(req.queryParams(string));
+		}
+		try {
+			return RecipeRepository.byIngredients(set);
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

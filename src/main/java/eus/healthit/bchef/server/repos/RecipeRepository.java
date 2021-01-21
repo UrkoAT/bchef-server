@@ -5,10 +5,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eus.healthit.bchef.server.request.StatusCode;
 
 public class RecipeRepository {
 
@@ -133,6 +136,34 @@ public class RecipeRepository {
 	public static void vote(Integer id, String uuid, Integer rating) throws SQLException {
 		String query = "INSERT INTO public.rel_rating VALUES (" + id + ", '" + uuid + "', " + rating + ")";
 		QueryCon.execute(query);
+	}
+
+	public static JSONObject byIngredients(Set<String> set) throws SQLException {
+		StringBuilder builder = new StringBuilder("SELECT COUNT(uuid_recipe), uuid_recipe FROM public.rel_ingredients INNER JOIN public.ingredients"
+				+ " ON (ingredients.id = rel_ingredients.id_ingredient) WHERE ");
+		List<String> comparations = new ArrayList<>();
+		int i = 0;
+		for (String string : set) {
+			comparations.add("UPPER(ingredients.name) LIKE UPPER('%"+string+"%')");
+			i++;
+		}
+		builder.append(String.join(" OR ", comparations));
+		builder.append(" GROUP BY uuid_recipe");
+		System.out.println(builder.toString());
+		ResultSet rSet = QueryCon.executeQuery(builder.toString());
+		List<String> searchList = new ArrayList<>();
+		while (rSet.next()) {
+			if (rSet.getInt("count") == i) {
+				searchList.add("'"+rSet.getString("uuid_recipe")+"'");
+			}
+		}
+		if (searchList.size() == 0) {
+			return new JSONObject().put("recipes", new JSONArray());
+		}
+		String query = "SELECT * FROM public.recipes WHERE recipes.uuid IN (" + String.join(", ", searchList) + ")";
+		ResultSet returnSet = QueryCon.executeQuery(query);
+		
+		return new JSONObject().put("recipes", parseRecipeList(returnSet)).put("status", StatusCode.SUCCESSFUL);
 	}
 
 }

@@ -2,6 +2,7 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,13 +95,14 @@ public class UserRepository {
 	}
 
 	public static JSONObject shopAdd(String name, int id) throws SQLException {
-		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('" + name + "', false) RETURNING id";
+		String query = "INSERT INTO public.shoplist (name, ticked) VALUES ('" + name + "', false) RETURNING id_shoplist";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		rSet.next();
-		Integer idSh = rSet.getInt("id");
+		Integer idSh = rSet.getInt("id_shoplist");
 		query = "INSERT INTO public.rel_shoplist VALUES (" + id + ", " + idSh + ")";
+		QueryCon.execute(query);
 		JSONObject json = new JSONObject();
-		json.put("item", idSh);
+		json.put("id", idSh);
 		json.put("status", StatusCode.SUCCESSFUL);
 		return json;
 	}
@@ -141,7 +143,7 @@ public class UserRepository {
 	}
 
 	public static void shopRemove(int id) throws SQLException {
-		String query = "DELETE FROM public.shoplist WHERE shoplist.id = " + id;
+		String query = "DELETE FROM public.shoplist WHERE shoplist.id_shoplist = " + id;
 		QueryCon.execute(query);
 	}
 
@@ -186,6 +188,25 @@ public class UserRepository {
 		} else {
 			return QueryCon.statusMessage(StatusCode.LOGIN_ERROR);
 		}
+	}
+
+	public static JSONObject getAllUsers() throws SQLException {
+		String query = "SELECT id, name, surname, email FROM public.users";
+		ResultSet rSet = QueryCon.executeQuery(query);
+		JSONArray array = new JSONArray();
+		while(rSet.next()) {
+			array.put(new JSONObject().put("id", rSet.getInt("id")).put("name", rSet.getString("name"))
+					.put("surname", rSet.getString("surname")).put("email", rSet.getString("email")));
+		}
+		return new JSONObject().put("users", array).put("status", StatusCode.SUCCESSFUL);
+	}
+
+	public static JSONObject getHistoryBetween(int userId, Timestamp from, Timestamp until) throws SQLException {
+		String query = "SELECT * FROM public.rel_history INNER JOIN public.recipes ON (rel_history.uuid_recipe = recipes.uuid) WHERE rel_history.id_user = "+userId 
+				+"AND recipes.publish_date BETWEEN '"+from.toString()+"' AND '"+until.toString()+"'";
+		ResultSet rSet = QueryCon.executeQuery(query);
+		JSONArray array = RecipeRepository.parseRecipeList(rSet);
+		return new JSONObject().put("history", array).put("status", StatusCode.SUCCESSFUL);
 	}
 
 }

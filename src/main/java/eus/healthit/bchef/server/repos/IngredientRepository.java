@@ -5,8 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eus.healthit.bchef.server.request.StatusCode;
 
 public class IngredientRepository {
 
@@ -33,9 +36,15 @@ public class IngredientRepository {
 	}
 
 	public static JSONObject ingredientLike(String like) throws JSONException, SQLException {
-		String query = "SELECT * FROM public.ingredients WHERE ingredients.name LIKE '%" + like + "%'";
+		String query = "SELECT * FROM public.ingredients WHERE ingredients.name LIKE '%" + like + "%' LIMIT 10";
 		ResultSet rSet = QueryCon.executeQuery(query);
-		return new JSONObject().put("ingredients", parseIngredientList(rSet));
+		JSONArray array = new JSONArray();
+		while(rSet.next()) {
+			JSONObject ingr = new JSONObject().put("id", rSet.getInt("id"))
+					.put("name", rSet.getString("name")).put("type", rSet.getString("type"));
+			array.put(ingr);
+		}
+		return new JSONObject().put("ingredients", array).put("status", StatusCode.SUCCESSFUL);
 	}
 
 	public static void makeRelation(int idIng, String uuidRecipe, String amount) throws SQLException {

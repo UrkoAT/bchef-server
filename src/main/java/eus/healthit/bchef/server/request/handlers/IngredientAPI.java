@@ -12,7 +12,7 @@ public class IngredientAPI {
 
 	public static JSONObject ingredientLike(Request req, Response res) {
 		try {
-			return IngredientRepository.ingredientLike(req.queryParams("like")).put("status", StatusCode.SUCCESSFUL);
+			return IngredientRepository.ingredientLike(req.queryParams("like"));
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

@@ -30,6 +30,7 @@ public class Server {
 
 			/* ############### GET ############### */
 			get("/search", (req, res) -> SearchAPI.search(req, res));
+			get("/byingredients", (req, res)-> SearchAPI.byIngredient(req, res));
 			get("/ingredient", (req, res) -> IngredientAPI.ingredientLike(req, res));
 			get("/page", (req, res) -> SearchAPI.page(req, res));
 
@@ -39,6 +40,8 @@ public class Server {
 				put("/follow", (req, res) -> UserAPI.follow(req, res));
 				put("/unfollow", (req, res) -> UserAPI.unfollow(req, res));
 				get("/name", (req, res) -> UserAPI.getName(req, res));
+				get("/allusers", (req,res) -> UserAPI.getAllUsers(req, res));
+				get("/history", (req, res) -> UserAPI.getHistoryBetween(req, res));
 				get("/byId", (req, res) -> UserAPI.getById(req, res));
 				put("/rate", (req, res) -> RecipeAPI.vote(req, res));
 				put("/config", (req, res) -> UserAPI.userUpdate(req, res));
