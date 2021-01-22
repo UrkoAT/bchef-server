@@ -1,6 +1,7 @@
 package eus.healthit.bchef.server.request.handlers;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import org.json.JSONObject;
 
@@ -204,11 +205,12 @@ public class UserAPI {
 	public static JSONObject getHistoryBetween(Request req, Response res) {
 		int userId = Integer.valueOf(req.queryParams("userid"));
 		String from = req.queryParams("from");
-		Timestamp tFrom = Timestamp.valueOf(from);
+		Instant tFrom = Instant.parse(from);
+		
 		String until = req.queryParams("until");
-		Timestamp tUntil = Timestamp.valueOf(until);
+		Instant tUntil = Instant.parse(until);
 		try {
-			return UserRepository.getHistoryBetween(userId, tFrom, tUntil);
+			return UserRepository.getHistoryBetween(userId, Timestamp.from(tFrom), Timestamp.from(tUntil));
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}
