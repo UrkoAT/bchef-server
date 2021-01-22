@@ -2,11 +2,17 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.postgresql.shaded.com.ongres.scram.common.ScramStringFormatting;
 
 public class InstructionRepository {
 
@@ -37,14 +43,21 @@ public class InstructionRepository {
 	public static int insertInstruction(JSONObject instruction, String recipeUUID) throws JSONException, SQLException {
 		String action = instruction.getString("action");
 		int value = instruction.getInt("value");
-		String image = ImageRepository.saveImage(instruction.getString("img"));
+		String image = ImageRepository.saveImage(instruction.getString("image"));
 		String text = instruction.getString("text");
 		int num = instruction.getInt("num");
-		String duration = instruction.getString("duration");
+		String duration = LocalTime.of(0, 0).toString();
+		try {
+			duration = instruction.getString("duration");
+			//duration = (durationstr!=null)?durationstr:"None";
+		} catch (Exception e) {
+		}
 		String query = "INSERT INTO public.instructions (action, value, img, txt, num, duration) "
 				+ String.format("VALUES ('%s', %d, '%s', '%s', %d, '%s')", action, value, image, text, num, duration)
 				+ " RETURNING instructions.id";
-		return QueryCon.executeQuery(query).getInt("id");
+		ResultSet rSet = QueryCon.executeQuery(query);
+		rSet.next();
+		return rSet.getInt("id");
 	}
 
 	public static void makeRelation(int idIns, String uuidRecipe) throws SQLException {

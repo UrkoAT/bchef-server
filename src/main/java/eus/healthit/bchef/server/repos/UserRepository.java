@@ -51,15 +51,17 @@ public class UserRepository {
 		return jsonList;
 	}
 
-	private static List<JSONObject> getShoplist(int id) throws SQLException {
+	private static JSONArray getShoplist(int id) throws SQLException {
 		String query = "SELECT * FROM public.rel_shoplist INNER JOIN public.shoplist ON (rel_shoplist.id_shoplist_item = shoplist.id_shoplist)"
-				+ "WHERE rel_shoplist.id_shoplist_item = " + id + "";
+				+ "WHERE rel_shoplist.id_user = " + id + "";
 		ResultSet rSetShop = QueryCon.executeQuery(query);
-		List<JSONObject> shoplist = new ArrayList<>();
+		
+		JSONArray shoplist = new JSONArray();
 		while (rSetShop.next()) {
 			JSONObject innerJsonObject = new JSONObject();
 			innerJsonObject.put("name", rSetShop.getString("name")).put("ticked", rSetShop.getBoolean("ticked"));
-			shoplist.add(innerJsonObject);
+			shoplist.put(innerJsonObject);
+			System.out.println(innerJsonObject.toString());
 		}
 		return shoplist;
 	}

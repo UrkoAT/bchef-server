@@ -36,7 +36,6 @@ public class RecipeRepository {
 		recipe.put("uuid", uuid).put("name", rSet.getString("name")).put("author", rSet.getInt("author"))
 				.put("rating", RecipeRepository.getRating(uuid))
 				.put("publish_date", rSet.getTimestamp("publish_date").toString())
-				.put("duration", rSet.getTime("duration").toString())
 				.put("img", ImageRepository.encodeImage(rSet.getString("img")))
 				.put("ingredients", IngredientRepository.getByUuid(uuid))
 				.put("description", rSet.getString("description"))
@@ -106,7 +105,6 @@ public class RecipeRepository {
 		String name = jsonObject.getString("name");
 		Integer author = jsonObject.getInt("author");
 		String publishDate = jsonObject.getString("publish_date");
-		String duration = jsonObject.getString("duration");
 		String description = jsonObject.getString("description");
 		String imagePath = ImageRepository.saveImage(jsonObject.getString("img"));
 		JSONArray ingredients = jsonObject.getJSONArray("ingredients");
@@ -119,6 +117,9 @@ public class RecipeRepository {
 		 * ((JSONObject)json).getString("amount"))));
 		 */
 
+		String query = "INSERT INTO public.recipes (uuid, name, author, publish_date, img, description) VALUES " + String
+				.format("('%s', '%s', '%s', '%s', '%s', '%s')", uuid, name, author, publishDate, imagePath, description);
+		QueryCon.execute(query);
 		for (Object object : ingredients) {
 			JSONObject json = (JSONObject) object;
 			IngredientRepository.makeRelation(json.getInt("id"), uuid, json.getString("amount"));
@@ -127,9 +128,7 @@ public class RecipeRepository {
 			JSONObject json = (JSONObject) object;
 			InstructionRepository.makeRelation(InstructionRepository.insertInstruction(json, uuid), uuid);
 		}
-		String query = "INSERT INTO public.recipes (uuid, name, author, publish_date, dutation, img, description) VALUES " + String
-				.format("('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid, name, author, publishDate, duration, imagePath, description);
-		QueryCon.execute(query);
+		vote(author, uuid, 0);
 		makePublishedRelation(author, uuid);
 	}
 

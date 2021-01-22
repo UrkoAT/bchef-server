@@ -16,6 +16,8 @@ public class ImageRepository {
 	public static String saveImage(String imageString) throws SQLException {
 		if (imageString.equals("nochange")) {
 			return "nochange";
+		} else if (imageString.equals("default")) {
+			return "default";
 		}
 		BufferedImage img = (BufferedImage) decodeImage(imageString);
 		File file = null;
@@ -32,7 +34,6 @@ public class ImageRepository {
 
 	public static Image decodeImage(String codedImage) {
 		try {
-			
 			byte[] bytes = Base64.getDecoder().decode(codedImage);
 			ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 			BufferedImage bImage2 = ImageIO.read(bis);
@@ -45,6 +46,9 @@ public class ImageRepository {
 
 	public static String encodeImage(String pathString) {
 		try {
+			if (pathString.equals("default")) {
+				return "default";
+			}
 			File file = new File(pathString);
 			String string = Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath()));
 			return string;
