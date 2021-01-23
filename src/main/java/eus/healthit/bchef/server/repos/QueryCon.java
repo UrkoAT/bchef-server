@@ -1,5 +1,7 @@
 package eus.healthit.bchef.server.repos;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,13 +16,40 @@ import org.postgresql.util.PSQLException;
 import eus.healthit.bchef.server.request.StatusCode;
 
 public class QueryCon {
-	public static final String DBURL = "jdbc:postgresql://servkolay.ddns.net:5432/Data";
+	public static final String DBURL = "jdbc:postgresql://localhost:5432/Data";
 
 	static Connection connection;
 	static Statement statement;
+	
+	
+	
+	/*
+	 * Encima que pongo el github en publico......
+	 * 
+	 */
+	
+	public static String leerCredenciales() {
+		String password = null;
+		try (BufferedReader lector = new BufferedReader(new FileReader("credentials.cred"))) {
+			String linea;
+			while ((linea = lector.readLine()) != null) {
+				password = linea; 
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			}
+		return password;
+	}
 
 	private static Statement getStatement() throws SQLException {
 		if (statement == null) {
+			connection = DriverManager.getConnection(DBURL, "postgres", leerCredenciales());
+			statement = connection.createStatement();
+		}
+		try {
+			statement = connection.createStatement();
+			statement.executeQuery("SELECT * FROM public.users WHERE 1 = 0");
+		} catch (Exception e) {
 			connection = DriverManager.getConnection(DBURL, "postgres", "mutriku123");
 			statement = connection.createStatement();
 		}
@@ -56,7 +85,6 @@ public class QueryCon {
 			statement.close();
 			connection.close();
 		} catch (Exception e) {
-			System.out.println("uwu");
 		}
 	}
 

@@ -46,7 +46,7 @@ public class ImageRepository {
 
 	public static String encodeImage(String pathString) {
 		try {
-			if (pathString.equals("default")) {
+			 if (pathString.equals("default")) {
 				return "default";
 			}
 			File file = new File(pathString);

@@ -110,7 +110,7 @@ public class UserRepository {
 	}
 
 	public static void shopSet(int id, boolean ticked) throws SQLException {
-		String query = "UPDATE public.shoplist SET shoplist.ticked = " + ticked + " WHERE shoplist.id = " + id;
+		String query = "UPDATE public.shoplist SET shoplist.ticked = " + ticked + " WHERE shoplist.id_shoplist = " + id;
 		QueryCon.execute(query);
 	}
 

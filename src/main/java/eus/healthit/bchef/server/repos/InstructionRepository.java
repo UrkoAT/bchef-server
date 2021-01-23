@@ -2,17 +2,12 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.postgresql.shaded.com.ongres.scram.common.ScramStringFormatting;
 
 public class InstructionRepository {
 
