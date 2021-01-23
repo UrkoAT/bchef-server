@@ -24,10 +24,9 @@ public class QueryCon {
 	
 	
 	/*
-	 * Encima que pongo el github en publico......
+	 * Encima que pongo el github en publico...... A ver como accedeis ahora a credentials.cred
 	 * 
 	 */
-	
 	public static String leerCredenciales() {
 		String password = null;
 		try (BufferedReader lector = new BufferedReader(new FileReader("credentials.cred"))) {
