@@ -52,14 +52,15 @@ public class RecipeRepository {
 	}
 
 	public static JSONObject searchLike(String like, int page) throws JSONException, SQLException {
-		String query = "SELECT * FROM public.recipes WHERE UPPER(recipes.name) LIKE UPPER('%" + like + "%') LIMIT 7 OFFSET " +page;
+		String query = "SELECT * FROM public.recipes WHERE UPPER(recipes.name) LIKE UPPER('%" +
+				like + "%') ORDER BY publish_date LIMIT 7 OFFSET " +page;
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return new JSONObject().put("recipes", parseRecipeList(rSet));
 	}
 
 	public static JSONObject getPage(String pagenum) throws SQLException {
 		Integer page = Integer.valueOf(pagenum);
-		String query = "SELECT * FROM public.recipes LIMIT 7 OFFSET " + page * 7 + "";
+		String query = "SELECT * FROM public.recipes ORDER BY publish_date LIMIT 7 OFFSET " + page * 7;
 		ResultSet rSet = QueryCon.executeQuery(query);
 		return new JSONObject().put("recipes", parseRecipeList(rSet));
 	}

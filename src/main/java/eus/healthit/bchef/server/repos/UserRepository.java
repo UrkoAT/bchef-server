@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -59,7 +58,7 @@ public class UserRepository {
 		JSONArray shoplist = new JSONArray();
 		while (rSetShop.next()) {
 			JSONObject innerJsonObject = new JSONObject();
-			innerJsonObject.put("name", rSetShop.getString("name")).put("ticked", rSetShop.getBoolean("ticked"));
+			innerJsonObject.put("name", rSetShop.getString("name")).put("ticked", rSetShop.getBoolean("ticked")).put("id", rSetShop.getInt("id_shoplist"));
 			shoplist.put(innerJsonObject);
 			System.out.println(innerJsonObject.toString());
 		}
@@ -110,7 +109,8 @@ public class UserRepository {
 	}
 
 	public static void shopSet(int id, boolean ticked) throws SQLException {
-		String query = "UPDATE public.shoplist SET shoplist.ticked = " + ticked + " WHERE shoplist.id_shoplist = " + id;
+		System.out.println(ticked + ":" + id);
+		String query = "UPDATE public.shoplist SET ticked = " + ticked + " WHERE shoplist.id_shoplist = " + id;
 		QueryCon.execute(query);
 	}
 
@@ -162,22 +162,28 @@ public class UserRepository {
 	}
 
 	public static void follow(Integer id, Integer id_followed) throws SQLException {
-		String query = String.format("INSERT INTO  public.rel_followed VALUES ('%s', '%s')", id, id_followed);
+		String query = String.format("INSERT INTO rel_followed (id_user, id_followed) SELECT %d, %d\r\n" + 
+				"WHERE NOT EXISTS (SELECT 1 FROM rel_followed WHERE id_user = %d AND id_followed = %d);", id, id_followed, id, id_followed);
 		QueryCon.execute(query);
 	}
 
 	public static void unfollow(Integer id, Integer id_followed) throws SQLException {
 		String query = String.format(
-				"DELETE FROM public.rel_followed WHERE rel_followed.id_user = %d AND rel_followed.id_followed = %d )",
+				"DELETE FROM public.rel_followed WHERE rel_followed.id_user = %d AND rel_followed.id_followed = %d",
 				id, id_followed);
 		QueryCon.execute(query);
 	}
 
 	public static String getName(Integer id) throws SQLException {
+		System.out.println(id);
 		String query = "SELECT username FROM public.users WHERE users.id = " + id;
 		ResultSet rSet = QueryCon.executeQuery(query);
-		rSet.next();
-		return rSet.getString("username");
+		if (rSet.next()) {
+			return rSet.getString("username");
+		}
+		else {
+			return "null";
+		}
 	}
 
 	public static JSONObject reauth(String username, String password) throws SQLException {

@@ -4,7 +4,6 @@ import org.json.JSONObject;
 
 import eus.healthit.bchef.server.repos.IngredientRepository;
 import eus.healthit.bchef.server.repos.QueryCon;
-import eus.healthit.bchef.server.request.StatusCode;
 import spark.Request;
 import spark.Response;
 

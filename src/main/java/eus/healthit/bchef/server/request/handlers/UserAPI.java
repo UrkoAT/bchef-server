@@ -188,7 +188,7 @@ public class UserAPI {
 			JSONObject json = new JSONObject(req.body());
 			String username = (String) json.get("username");
 			String password = (String) json.get("password");
-			return UserRepository.reauth(username, QueryCon.md5(password)).put("status", StatusCode.SUCCESSFUL);
+			return UserRepository.reauth(username, QueryCon.md5(password));
 		} catch (Exception e) {
 			return QueryCon.statusMessage(QueryCon.exceptionHandler(e));
 		}

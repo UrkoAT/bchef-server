@@ -16,7 +16,7 @@ import org.postgresql.util.PSQLException;
 import eus.healthit.bchef.server.request.StatusCode;
 
 public class QueryCon {
-	public static final String DBURL = "jdbc:postgresql://localhost:5432/Data";
+	public static final String DBURL = "jdbc:postgresql://192.168.0.4:5432/Data";
 
 	static Connection connection;
 	static Statement statement;
