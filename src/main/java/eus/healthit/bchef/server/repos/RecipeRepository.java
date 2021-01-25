@@ -2,8 +2,8 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -71,9 +71,9 @@ public class RecipeRepository {
 	}
 
 	public static void makeHistoryRelation(int userID, String uuidRecipe) throws SQLException {
-		Date date = new Date();
+		LocalDate date = LocalDate.now();
 		String query = String.format("INSERT INTO public.rel_history VALUES (%d, '%s' '%s')", userID, uuidRecipe,
-				date.toInstant());
+				date.toString());
 		QueryCon.execute(query);
 	}
 

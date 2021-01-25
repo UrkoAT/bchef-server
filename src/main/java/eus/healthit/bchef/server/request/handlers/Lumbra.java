@@ -1,5 +1,7 @@
 package eus.healthit.bchef.server.request.handlers;
 
+import org.json.JSONObject;
+
 public class Lumbra {
 	
 	public static final String LUMBRA = "Lumbra\r\n" + 
@@ -67,7 +69,7 @@ public class Lumbra {
 			"Hop off the the window, come on, girl, come on (Yeh)\r\n" + 
 			"In my heart I feel fire, fuego";
 	
-	public static String lumbra() {
-		return LUMBRA;
+	public static JSONObject lumbra() {
+		return new JSONObject().put("lumbra", LUMBRA);
 	}
 }
