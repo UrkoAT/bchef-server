@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import eus.healthit.bchef.server.request.handlers.IngredientAPI;
+import eus.healthit.bchef.server.request.handlers.Lumbra;
 import eus.healthit.bchef.server.request.handlers.RecipeAPI;
 import eus.healthit.bchef.server.request.handlers.SearchAPI;
 import eus.healthit.bchef.server.request.handlers.UserAPI;
@@ -62,6 +63,10 @@ public class Server {
 				get("/check", (req, res) -> UserAPI.checkUser(req, res));
 				post("/recipe", (req, res) -> RecipeAPI.addRecipe(req, res));
 			});
+			
+			/*############## EASTER ############### */
+			get("/lumbra", (req, res) -> Lumbra.lumbra());
+			
 		});
 	}
 }
