@@ -2,7 +2,6 @@ package eus.healthit.bchef.server.repos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class InstructionRepository {
 		JSONObject instruction = new JSONObject();
 		instruction.put("id", rset.getInt("id")).put("action", rset.getString("action"))
 				.put("value", rset.getInt("value")).put("img", ImageRepository.encodeImage(rset.getString("img")))
-				.put("num", rset.getInt("num")).put("duration", rset.getTime("duration").toString()).put("txt", rset.getString("txt"));
+				.put("num", rset.getInt("num")).put("duration", rset.getLong("duration")).put("txt", rset.getString("txt"));
 
 		return instruction;
 	}
@@ -41,14 +40,13 @@ public class InstructionRepository {
 		String image = ImageRepository.saveImage(instruction.getString("image"));
 		String text = instruction.getString("text");
 		int num = instruction.getInt("num");
-		String duration = LocalTime.of(0, 0).toString();
+		long duration = 0;
 		try {
-			duration = instruction.getString("duration");
-			//duration = (durationstr!=null)?durationstr:"None";
+			duration = instruction.getLong("duration");
 		} catch (Exception e) {
 		}
 		String query = "INSERT INTO public.instructions (action, value, img, txt, num, duration) "
-				+ String.format("VALUES ('%s', %d, '%s', '%s', %d, '%s')", action, value, image, text, num, duration)
+				+ String.format("VALUES ('%s', %d, '%s', '%s', %d, %d)", action, value, image, text, num, duration)
 				+ " RETURNING instructions.id";
 		ResultSet rSet = QueryCon.executeQuery(query);
 		rSet.next();

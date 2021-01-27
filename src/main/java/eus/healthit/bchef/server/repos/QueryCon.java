@@ -20,7 +20,7 @@ public class QueryCon {
 
 	static Connection connection;
 	static Statement statement;
-	
+	static String password = null;
 	
 	
 	/*
@@ -41,15 +41,18 @@ public class QueryCon {
 	}
 
 	private static Statement getStatement() throws SQLException {
+		if (password == null) {
+			password =  leerCredenciales();
+		}
 		if (statement == null) {
-			connection = DriverManager.getConnection(DBURL, "postgres", leerCredenciales());
+			connection = DriverManager.getConnection(DBURL, "postgres", password);
 			statement = connection.createStatement();
 		}
 		try {
 			statement = connection.createStatement();
 			statement.executeQuery("SELECT * FROM public.users WHERE 1 = 0");
 		} catch (Exception e) {
-			connection = DriverManager.getConnection(DBURL, "postgres", "mutriku123");
+			connection = DriverManager.getConnection(DBURL, "postgres", password);
 			statement = connection.createStatement();
 		}
 		return statement;
